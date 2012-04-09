@@ -15,13 +15,24 @@ class MainPage(webapp.RequestHandler):
 		channels.remove(channels[0])
 		channels.remove(channels[0])
 		channels.remove('')
-		self.response.out.write(""" <table style=\"border:1px solid #f00\"> """)
+		self.response.out.write("<html>" + "\n")
+		self.response.out.write("	<head>" + "\n")
+		self.response.out.write("		<title>Listing channels </title>" + "\n")
+		self.response.out.write("	</head>" + "\n")
+		self.response.out.write("	<body>" + "\n")
+		self.response.out.write("	<form id='channels' action='confirmchannels.py' method='POST'>" + "\n")
+		self.response.out.write("	<table> " + "\n")
 		for channel in channels:
 			details = channel.split("|")						
-			self.response.out.write("<tr><td>" + details[0] + "</td><td>" + details[1] + "</td></tr>") 				
+			self.response.out.write("		<tr><td>" + "\n")
+			self.response.out.write("			<input type='checkbox' name='" + details[0] + "' id='" + details[0] + "' value='" + details[0] + "'  />" + "\n")
+			self.response.out.write("		</td><td>" + "\n")
+			self.response.out.write("			<label for='" + details[0] + "'>" + details[1] + "</label>" + "\n")
+			self.response.out.write("		</td></tr>" + "\n")
 		self.response.out.write(""" <table> """)
 		self.response.out.write("""
-            </body>
+			</form>
+           </body>
           </html>""")
 
 application = webapp.WSGIApplication(

@@ -98,7 +98,7 @@ class ConfirmChannels(webapp.RequestHandler):
 			prehtmlcontent += ("<ul>\n")
 			for channel in selectedchannels:
 				prehtmlcontent += ("	<li>" + dictChannels[channel] + " - " + channel +  "</li>\n")
-				formcontent += ("<input type='hidden' name='channels' id='" + channel + "' value='" + dictChannels[channel] + "' />")
+				formcontent += ("<input type='hidden' name='channels' id='" + channel + "' value='" + dictChannels[channel] + "|" + channel + "' />")
 			prehtmlcontent += ("</ul>\n")
 			prehtmlcontent += ("</div>\n")
 			formcontent += "<label>Search for: </label><input type='text' class='span3' placeholder='New girl'>"
@@ -120,22 +120,57 @@ class ConfirmChannels(webapp.RequestHandler):
 		
 class SearchShow(webapp.RequestHandler):
     def post(self):
-		selectedchannels = self.request.get_all("channels")
+		#test of new function
+		#prehtmlcontent = examinefile("92", "")
 		
+		prehtmlcontent = ""
+		selectedchannels = self.request.get_all("channels")
+		#selectedchannels.remove("")
+		if len(selectedchannels) > 0:
+			for channel in selectedchannels:
+				detail = channel.split("|")
+				prehtmlcontent +="<div class='alert'><h2>" + detail[0] + "</h2>\n"
+				prehtmlcontent += examinefile(detail[1], "")
+				prehtmlcontent += "\n</div>"
 					
 		#Add all this to the template
 		template_values = {
             'title': "Searching for series ",
-			'instructions': "Check the correct channels have been selected, and then enter the name of a series you would like to scan for",
+			'instructions': "Scanning...",
 			'applicationname': "Television Notifications",
             'description': "description",
             'author': "Me!",
-			'prehtmlcontent': "hello",
+			'prehtmlcontent': prehtmlcontent,
         }
 		path = os.path.join(os.path.dirname(__file__), 'index.html')
 		self.response.out.write(template.render(path, template_values))
 		
-
+def examinefile(channelnumber, series):		
+	#Grab the channel file from the Radio Times
+	f = urllib.urlopen("http://xmltv.radiotimes.com/xmltv/" + channelnumber + ".dat")		
+	s = f.read()
+	f.close()
+	s = s.lower()
+	listofprogrammes = ""
+	#Array up the data, and remove the non-programme entries
+	programmes = s.split('\n')
+	programmes.remove(programmes[0])
+	programmes.remove(programmes[0])
+	programmes.remove('')
+	for programme in programmes:
+		detail = programme.split("~")
+		if len(series) > 0:
+			if series.lower() == detail[0]:
+				if detail[11] == "true":
+					listofprogrammes += ("	<li>" + detail[0] +  " - " + detail[1] + "</li>\n")
+		else:
+			if detail[11] == "true" :
+				listofprogrammes += ("	<li>" + detail[0] +  " - " + detail[1] + "</li>\n")
+	listofprogrammes = ("<ul>\n" + listofprogrammes + "\n</ul>")
+	return listofprogrammes
+		
+		
+		
 application = webapp.WSGIApplication(
                                      [('/', MainPage),
 									  ('/confirmchannels', ConfirmChannels),									  

@@ -101,7 +101,7 @@ class ConfirmChannels(webapp.RequestHandler):
 				formcontent += ("<input type='hidden' name='channels' id='" + channel + "' value='" + dictChannels[channel] + "|" + channel + "' />")
 			prehtmlcontent += ("</ul>\n")
 			prehtmlcontent += ("</div>\n")
-			formcontent += "<label>Search for: </label><input type='text' class='span3' placeholder='New girl'>"
+			formcontent += "<label>Search for: </label><input type='text' class='span3' placeholder='New girl' name='series' id='series'>"
 			formcontent += ("<input type='submit' value='Search' class='btn' />")			
 			
 		#Add all this to the template
@@ -125,14 +125,30 @@ class SearchShow(webapp.RequestHandler):
 		
 		prehtmlcontent = ""
 		selectedchannels = self.request.get_all("channels")
+		series = self.request.get("series")
+		foundseries = 0
+		
+		if len(series) < 2 :
+			series = ""
+		
 		#selectedchannels.remove("")
 		if len(selectedchannels) > 0:
 			for channel in selectedchannels:
 				detail = channel.split("|")
 				prehtmlcontent +="<div class='alert'><h2>" + detail[0] + "</h2>\n"
-				prehtmlcontent += examinefile(detail[1], "")
+				resultofsearch = examinefile(detail[1], series)
+				if len(resultofsearch) < 2: 
+					if len(series) < 2 :
+						resultofsearch = "<p>No new series found</p>"
+					else:
+						resultofsearch = "<p>New series of <i>" + series + "</i> not found</p>"
+				else: 
+					foundseries = 1
+				prehtmlcontent += resultofsearch
 				prehtmlcontent += "\n</div>"
-					
+			if foundseries == 0: 
+				if len(series) > 2 :
+					prehtmlcontent +="<div class='alert'><h2>A new series of <em>" + series + "</em> was not found - would you like to recieve an email when it is about to be shown?</h2>\n"
 		#Add all this to the template
 		template_values = {
             'title': "Searching for series ",
@@ -166,7 +182,10 @@ def examinefile(channelnumber, series):
 		else:
 			if detail[11] == "true" :
 				listofprogrammes += ("	<li>" + detail[0] +  " - " + detail[1] + "</li>\n")
-	listofprogrammes = ("<ul>\n" + listofprogrammes + "\n</ul>")
+	if len(listofprogrammes) < 3:
+		listofprogrammes = ""
+	else:
+		listofprogrammes = ("<ul>\n" + listofprogrammes + "\n</ul>")
 	return listofprogrammes
 		
 		

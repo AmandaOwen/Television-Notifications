@@ -195,23 +195,42 @@ class SearchShow(webapp.RequestHandler):
 			series = ""
 		
 		#selectedchannels.remove("")
-		if len(selectedchannels) > 0:
+		columnlength = len(selectedchannels) / 4
+		currentlength = 0
+		
+		#If we're looking for any news series, make sure all the channels get listed
+		if len(series) < 2 :
 			for channel in selectedchannels:
+				currentlength = currentlength + 1
 				detail = channel.split("|")
-				prehtmlcontent +="<div class='alert'><h2>" + detail[0] + "</h2>\n"
+				if currentlength == 1:
+					prehtmlcontent +="\n<div  class='span3'>"
 				resultofsearch = examinefile(detail[1], series)
+				prehtmlcontent +="\n	<div class='alert'><h2>" + detail[0] + "</h2>"
 				if len(resultofsearch) < 2: 
-					if len(series) < 2 :
-						resultofsearch = "<p>No new series found</p>"
-					else:
-						resultofsearch = "<p>New series of <i>" + series + "</i> not found</p>"
-				else: 
-					foundseries = 1
+					resultofsearch = "\n			<p>No new series found</p>"
 				prehtmlcontent += resultofsearch
-				prehtmlcontent += "\n</div>"
+				prehtmlcontent += "\n	</div>"
+				if currentlength > columnlength: 
+					prehtmlcontent += "\n</div>"
+					currentlength = 0
+			prehtmlcontent += "\n</div>"	
+		#If we're looking for a specific series, only list the channels that are showing it, if any
+		else :		
+			for channel in selectedchannels:
+				currentlength = currentlength + 1
+				detail = channel.split("|")
+				resultofsearch = examinefile(detail[1], series)
+				if len(resultofsearch) > 2: 
+					prehtmlcontent +="\n	<div class='alert alert-success'><h2>" + detail[0] + "</h2>"					
+					prehtmlcontent += resultofsearch
+					prehtmlcontent += "\n	</div>"
+					foundseries = 1
 			if foundseries == 0: 
 				if len(series) > 2 :
-					prehtmlcontent +="<div class='alert'><h2>A new series of <em>" + series + "</em> was not found - would you like to recieve an email when it is about to be shown?</h2>\n"
+					prehtmlcontent = "<div class='alert'><h2>A new series of <em>" + series + "</em> was not found - would you like to recieve an email when it is about to be shown?</h2>\n" 
+		
+		
 		#Add all this to the template
 		template_values = {
             'title': "Searching for series ",
@@ -248,7 +267,7 @@ def examinefile(channelnumber, series):
 	if len(listofprogrammes) < 3:
 		listofprogrammes = ""
 	else:
-		listofprogrammes = ("<ul>\n" + listofprogrammes + "\n</ul>")
+		listofprogrammes = ("\n		<ul>\n" + listofprogrammes + "\n		</ul>")
 	return listofprogrammes
 
 # ----------------------------------------------------

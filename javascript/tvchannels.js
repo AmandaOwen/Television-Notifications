@@ -1,11 +1,11 @@
-function SelectFreeview() 
+function SelectType(channels) 
 {
 	$(".normal").each( function() 
 	{
 		$(this).attr("checked",false);	
 	}	
 	)
-	$(".freeview").each ( function() 
+	$(channels).each ( function() 
 	{ 
 		$(this).attr("checked", "checked");
 	}

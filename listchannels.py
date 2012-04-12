@@ -1,115 +1,123 @@
 import urllib
 import os
 import cgi
+from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
 
 class MainPage(webapp.RequestHandler):
     def get(self):
-		#Grab the channel file from the Radio Times
-		f = urllib.urlopen("http://xmltv.radiotimes.com/xmltv/channels.dat")		
-		s = f.read()
-		f.close()
-		
-		#Assign the default select buttons/channels
-		freeview = GetFreeviewChannels()
-		skysports = GetSkySports()
-		skyentertainment = GetSkyEntertainment()
-		
-		#Array up the data, and remove the non-channel entries
-		channels = s.split('\n')
-		channels.remove(channels[0])
-		channels.remove(channels[0])
-		channels.remove('')
-		
-		sortingchannels = ['']
-		for channel in channels: 
-			details = channel.split("|")	
-			sortingchannels.append(details[1] + "|" + details[0])
-		channels = sortingchannels
-		channels.remove('')
-		channels.sort()
-				
-		
-		#Build the buttons that appear at the top of the form
-		
-		buttons = ("""    
-					<div class="span12">
-						<div class="btn-group" style="float:left; padding-right:10px;">
-						<a href="#" class="btn" onClick="return false;">Selections...</a>
-						<button class="btn dropdown-toggle" data-toggle="dropdown">
-						<span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu">
-							<li><a href='#' onClick='SelectType(".freeview"); return false;'>Select Freeview channels</a></li>
-							<li><a href='#' onClick='SelectType(".skysports"); return false;'>Select Sky Sports channels</a></li>
-							<li><a href='#' onClick='SelectType(".skyentertainment"); return false;'>Select Sky Entertainment channels</a></li>
-							<li><a href="#" onClick="Unselect(); return false;">Clear selections</a></li>
-						</ul>
-						</div>
-						<input type='submit' value='Select channels' class='btn' /> <br />
-					</div>
-		""")
-	
-		#Add the channels to a table with checkboxes
-		#
-		formcontent = ("\n")
 
-		#These will help figure out when to start a new div/table, so the content can be compressed into columns
-		columnlength = len(channels) / 4
-		currentlength = 0
-		for channel in channels:
-			currentlength = currentlength + 1
-			#Start the table if appropriate
-			if currentlength == 1:
-				formcontent += ("	<div class='span3'><br />")
-				formcontent += ("	<table class='table table-striped'>\n")			
-				formcontent += ("		<tbody>\n")
-				formcontent += ("		<tr><th>Select?</th><th>Channel name</th>\n")
-			details = channel.split("|")						
-			formcontent += ("		<tr><td>\n")
-			formcontent += ("			<input type='checkbox' name='channels' id='" + details[1] + "' value='" + details[1] + "'")
-			if details[0] in freeview: 
-				formcontent += (" class='normal freeview' ")
-			elif details[0] in skysports:
-				formcontent += (" class='normal skysports' ")
-			elif details[0] in skyentertainment:
-				formcontent += (" class='normal skyentertainment' ")
-			else:
-				formcontent += (" class='normal' ")	
-			formcontent += ("/>\n")
-			formcontent += ("		</td><td>\n")
-			formcontent += ("			<label for='" + details[1] + "'>" + details[0] + "</label>\n")
-			formcontent += ("		</td></tr>\n")
-			#Now close off the table if appropriate
-			if currentlength > columnlength:
-				formcontent += ("		</tbody>\n")
-				formcontent += (" </table> \n")	
-				formcontent += (" </div> \n")	
-				currentlength = 0
+		user = users.get_current_user()
+		if user:
+			#Grab the channel file from the Radio Times
+			f = urllib.urlopen("http://xmltv.radiotimes.com/xmltv/channels.dat")		
+			s = f.read()
+			f.close()
+			
+			#Assign the default select buttons/channels
+			freeview = GetFreeviewChannels()
+			skysports = GetSkySports()
+			skyentertainment = GetSkyEntertainment()
+			
+			#Array up the data, and remove the non-channel entries
+			channels = s.split('\n')
+			channels.remove(channels[0])
+			channels.remove(channels[0])
+			channels.remove('')
+			
+			sortingchannels = ['']
+			for channel in channels: 
+				details = channel.split("|")	
+				sortingchannels.append(details[1] + "|" + details[0])
+			channels = sortingchannels
+			channels.remove('')
+			channels.sort()
+					
+			
+			#Build the buttons that appear at the top of the form
+			
+			buttons = ("""    
+						<div class="span12">
+							<div class="btn-group" style="float:left; padding-right:10px;">
+							<a href="#" class="btn" onClick="return false;">Selections...</a>
+							<button class="btn dropdown-toggle" data-toggle="dropdown">
+							<span class="caret"></span>
+							</button>
+							<ul class="dropdown-menu">
+								<li><a href='#' onClick='SelectType(".freeview"); return false;'>Select Freeview channels</a></li>
+								<li><a href='#' onClick='SelectType(".skysports"); return false;'>Select Sky Sports channels</a></li>
+								<li><a href='#' onClick='SelectType(".skyentertainment"); return false;'>Select Sky Entertainment channels</a></li>
+								<li><a href="#" onClick="Unselect(); return false;">Clear selections</a></li>
+							</ul>
+							</div>
+							<input type='submit' value='Select channels' class='btn' /> <br />
+						</div>
+			""")
 		
-		formcontent += ("		</tbody>\n")
-		formcontent += (" </table> \n")	
-		formcontent += (" </div> \n")	
-		formcontent += ("<div class='span12'><input type='submit' value='Select channels' class='btn' /></div>")
-		
-		#set up the form to go to the next page
-		formaction = '/confirmchannels'
-		
-	
-		#Add all this to the template
-		template_values = {
-            'title': "Choose the TV channels to scan ",
-			'applicationname': "Television Notifications",
-			'instructions': "Please select the TV channels you'd like to scan",
-            'description': "description",
-            'author': "Me!",
-			'formcontent': buttons + formcontent,
-			'formaction': formaction,
-        }
-		path = os.path.join(os.path.dirname(__file__), 'index.html')
-		self.response.out.write(template.render(path, template_values))
+			#Add the channels to a table with checkboxes
+			#
+			formcontent = ("\n")
+
+			#These will help figure out when to start a new div/table, so the content can be compressed into columns
+			columnlength = len(channels) / 4
+			currentlength = 0
+			for channel in channels:
+				currentlength = currentlength + 1
+				#Start the table if appropriate
+				if currentlength == 1:
+					formcontent += ("	<div class='span3'><br />")
+					formcontent += ("	<table class='table table-striped'>\n")			
+					formcontent += ("		<tbody>\n")
+					formcontent += ("		<tr><th>Select?</th><th>Channel name</th>\n")
+				details = channel.split("|")						
+				formcontent += ("		<tr><td>\n")
+				formcontent += ("			<input type='checkbox' name='channels' id='" + details[1] + "' value='" + details[1] + "'")
+				if details[0] in freeview: 
+					formcontent += (" class='normal freeview' ")
+				elif details[0] in skysports:
+					formcontent += (" class='normal skysports' ")
+				elif details[0] in skyentertainment:
+					formcontent += (" class='normal skyentertainment' ")
+				else:
+					formcontent += (" class='normal' ")	
+				formcontent += ("/>\n")
+				formcontent += ("		</td><td>\n")
+				formcontent += ("			<label for='" + details[1] + "'>" + details[0] + "</label>\n")
+				formcontent += ("		</td></tr>\n")
+				#Now close off the table if appropriate
+				if currentlength > columnlength:
+					formcontent += ("		</tbody>\n")
+					formcontent += (" </table> \n")	
+					formcontent += (" </div> \n")	
+					currentlength = 0
+			
+			formcontent += ("		</tbody>\n")
+			formcontent += (" </table> \n")	
+			formcontent += (" </div> \n")	
+			formcontent += ("<div class='span12'><input type='submit' value='Select channels' class='btn' /></div>")
+			
+			#set up the form to go to the next page
+			formaction = '/confirmchannels'
+			
+			
+			#Add all this to the template
+			template_values = {
+				'title': "Choose the TV channels to scan ",
+				'applicationname': "Television Notifications",
+				'instructions': "Please select the TV channels you'd like to scan",
+				'description': "description",
+				'author': "Me!",
+				'username': user.nickname(),
+				'logouturl': users.create_logout_url("/"),
+				'formcontent': buttons + formcontent,
+				'formaction': formaction,
+			}
+			path = os.path.join(os.path.dirname(__file__), 'index.html')
+			self.response.out.write(template.render(path, template_values))
+		else: 
+			self.redirect(users.create_login_url(self.request.uri))
 
 class ConfirmChannels(webapp.RequestHandler):
     def post(self):

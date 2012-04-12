@@ -133,15 +133,37 @@ class ConfirmChannels(webapp.RequestHandler):
 		formcontent = "\n"
 		formaction = "/searchshow"
 		
+		youhaveselectedpre = ("""			
+          <div class="accordion" id="accordion2">
+            <div class="accordion-group">
+              <div class="accordion-heading alert-success">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+		""")
+		youhaveselectedpost = ("""
+		 		</a>
+             </div>
+             <div style="height: 0px;" id="collapseOne" class="accordion-body collapse">
+                <div class="accordion-inner alert-success">
+        """)
+		
+		channellistpost = ("""
+                </div>
+             </div>
+        </div>
+		</div>
+			""")
+		
+		
 		#Show the whole caboodle
 		if len(selectedchannels) > 0:
-			prehtmlcontent += ("<div class='alert alert-success'><a class='close' data-dismiss='alert'>x</a><p>You have selected "+ str(len(selectedchannels)) + " channels to be scanned.</p>\n")
 			prehtmlcontent += ("<ul>\n")
 			for channel in selectedchannels:
 				prehtmlcontent += ("	<li>" + dictChannels[channel] + " - " + channel +  "</li>\n")
 				formcontent += ("<input type='hidden' name='channels' id='" + channel + "' value='" + dictChannels[channel] + "|" + channel + "' />")
 			prehtmlcontent += ("</ul>\n")
-			prehtmlcontent += ("</div>\n")
+			prehtmlcontent = youhaveselectedpre + "<p>You have selected "+ str(len(selectedchannels)) + " channels to be scanned.</p>\n" + youhaveselectedpost + prehtmlcontent + channellistpost
+
+			
 			formcontent += "<label>Search for: </label><input type='text' class='span3' placeholder='New girl' name='series' id='series'>"
 			formcontent += ("<input type='submit' value='Search' class='btn' />")			
 			
@@ -152,8 +174,8 @@ class ConfirmChannels(webapp.RequestHandler):
 			'applicationname': "Television Notifications",
             'description': "description",
             'author': "Me!",
-			'prehtmlcontent': prehtmlcontent,
-			'formcontent': formcontent,
+			'prehtmlcontent': "		<div class='span6'>\n" + prehtmlcontent + "				</div>",
+			'formcontent': "		<div class='span6'>\n" + formcontent + "				</div>",
 			'formaction': formaction,
         }
 		path = os.path.join(os.path.dirname(__file__), 'index.html')

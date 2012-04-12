@@ -12,10 +12,10 @@ class MainPage(webapp.RequestHandler):
 		s = f.read()
 		f.close()
 		
-		#Assign the freeview channels
-		freeview = ['Channel 4 HD', 'BBC1', 'BBC1 HD', 'BBC2', 'BBC3', 'BBC4', 'BBC News', 'BBC HD', 'CBBC', 'CBeebies', 'Channel 4', 
-			'More4', 'Film4', 'E4', '4Music', 'Channel 5', 'Channel 5 HD', '5*', '5USA', 'ITV1', 'ITV2', 'ITV3', 'ITV4', 'ITV1 HD', 
-			'CITV', 'S4C', 'Quest', 'Yesterday', 'Challenge', 'Pick TV', 'Dave', 'BBC News', 'BBC Parliament', 'Sky News', 'Al Jazeera English']
+		#Assign the default select buttons/channels
+		freeview = GetFreeviewChannels()
+		skysports = GetSkySports()
+		skyentertainment = GetSkyEntertainment()
 		
 		#Array up the data, and remove the non-channel entries
 		channels = s.split('\n')
@@ -30,28 +30,69 @@ class MainPage(webapp.RequestHandler):
 		channels = sortingchannels
 		channels.remove('')
 		channels.sort()
+				
 		
+		#Build the buttons that appear at the top of the form
+		
+		buttons = ("""    
+					<div class="span12">
+						<div class="btn-group" style="float:left; padding-right:10px;">
+						<a href="#" class="btn" onClick="return false;">Selections...</a>
+						<button class="btn dropdown-toggle" data-toggle="dropdown">
+						<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu">
+							<li><a href='#' onClick='SelectType(".freeview"); return false;'>Select Freeview channels</a></li>
+							<li><a href='#' onClick='SelectType(".skysports"); return false;'>Select Sky Sports channels</a></li>
+							<li><a href='#' onClick='SelectType(".skyentertainment"); return false;'>Select Sky Entertainment channels</a></li>
+							<li><a href="#" onClick="Unselect(); return false;">Clear selections</a></li>
+						</ul>
+						</div>
+						<input type='submit' value='Select channels' class='btn' /> <br />
+					</div>
+		""")
+	
 		#Add the channels to a table with checkboxes
-		formcontent = ("<p><a href='#' class='btn btn-info' onClick='SelectFreeview()'>Select Freeview channels</a> or <a href='#'  class='btn btn-info' onClick='Unselect()'>Unselect all</a>\n")		
-		formcontent += ("<input type='submit' value='Select channels' class='btn' /> </p>")
-		formcontent += ("	<table class='table table-striped'>\n")			
-		formcontent += ("		<tbody>\n")
-		formcontent += ("		<tr><th>Select?</th><th>Channel name</th>\n")
+		#
+		formcontent = ("\n")
+
+		#These will help figure out when to start a new div/table, so the content can be compressed into columns
+		columnlength = len(channels) / 4
+		currentlength = 0
 		for channel in channels:
+			currentlength = currentlength + 1
+			#Start the table if appropriate
+			if currentlength == 1:
+				formcontent += ("	<div class='span3'><br />")
+				formcontent += ("	<table class='table table-striped'>\n")			
+				formcontent += ("		<tbody>\n")
+				formcontent += ("		<tr><th>Select?</th><th>Channel name</th>\n")
 			details = channel.split("|")						
 			formcontent += ("		<tr><td>\n")
 			formcontent += ("			<input type='checkbox' name='channels' id='" + details[1] + "' value='" + details[1] + "'")
 			if details[0] in freeview: 
 				formcontent += (" class='normal freeview' ")
+			elif details[0] in skysports:
+				formcontent += (" class='normal skysports' ")
+			elif details[0] in skyentertainment:
+				formcontent += (" class='normal skyentertainment' ")
 			else:
 				formcontent += (" class='normal' ")	
 			formcontent += ("/>\n")
 			formcontent += ("		</td><td>\n")
 			formcontent += ("			<label for='" + details[1] + "'>" + details[0] + "</label>\n")
-			formcontent += ("		</td></tr>\n")	
+			formcontent += ("		</td></tr>\n")
+			#Now close off the table if appropriate
+			if currentlength > columnlength:
+				formcontent += ("		</tbody>\n")
+				formcontent += (" </table> \n")	
+				formcontent += (" </div> \n")	
+				currentlength = 0
+		
 		formcontent += ("		</tbody>\n")
-		formcontent += (" </table> ")		
-		formcontent += ("<input type='submit' value='Select channels' class='btn' />")
+		formcontent += (" </table> \n")	
+		formcontent += (" </div> \n")	
+		formcontent += ("<div class='span12'><input type='submit' value='Select channels' class='btn' /></div>")
 		
 		#set up the form to go to the next page
 		formaction = '/confirmchannels'
@@ -64,7 +105,7 @@ class MainPage(webapp.RequestHandler):
 			'instructions': "Please select the TV channels you'd like to scan",
             'description': "description",
             'author': "Me!",
-			'formcontent': formcontent,
+			'formcontent': buttons + formcontent,
 			'formaction': formaction,
         }
 		path = os.path.join(os.path.dirname(__file__), 'index.html')
@@ -187,7 +228,21 @@ def examinefile(channelnumber, series):
 	else:
 		listofprogrammes = ("<ul>\n" + listofprogrammes + "\n</ul>")
 	return listofprogrammes
-		
+
+# ----------------------------------------------------
+# Define each set of channels here
+# ----------------------------------------------------
+def GetFreeviewChannels(): 
+	channels = ['Channel 4 HD', 'BBC1', 'BBC1 HD', 'BBC2', 'BBC3', 'BBC4', 'BBC News', 'BBC HD', 'CBBC', 'CBeebies', 'Channel 4', 
+			'More4', 'Film4', 'E4', '4Music', 'Channel 5', 'Channel 5 HD', '5*', '5USA', 'ITV1', 'ITV2', 'ITV3', 'ITV4', 'ITV1 HD', 
+			'CITV', 'S4C', 'Quest', 'Yesterday', 'Challenge', 'Pick TV', 'Dave', 'BBC News', 'BBC Parliament', 'Sky News', 'Al Jazeera English']
+	return channels
+def GetSkySports(): 
+	channels = ['Sky Sports 1', 'Sky Sports 2', 'Sky Sports 3', 'Sky Sports 4', 'Sky Sports F1', 'Sky Sports News']
+	return channels	
+def GetSkyEntertainment(): 
+	channels = ['Sky Atlantic', 'Sky 1', 'Sky Living', 'Sky Arts 1', 'Sky Arts 2', 'Comedy Central', 'FX']
+	return channels	
 		
 		
 application = webapp.WSGIApplication(

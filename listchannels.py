@@ -260,10 +260,10 @@ def examinefile(channelnumber, series):
 		if len(series) > 0:
 			if series.lower() == detail[0]:
 				if detail[11] == "true":
-					listofprogrammes += ("	<li>" + detail[0] +  " - " + detail[1] + "</li>\n")
+					listofprogrammes += ("	<li><strong style='text-transform:capitalize'>" + detail[0] +  "</strong> - " + detail[1] + ": " + detail[19] + " (" + detail[20] + ") </li>\n")
 		else:
 			if detail[11] == "true" :
-				listofprogrammes += ("	<li>" + detail[0] +  " - " + detail[1] + "</li>\n")
+				listofprogrammes += ("	<li><strong style='text-transform:capitalize'>" + detail[0] +  "</strong> - " + detail[1] + ": " + detail[19] + " (" + detail[20] + ") </li>\n")
 	if len(listofprogrammes) < 3:
 		listofprogrammes = ""
 	else:

@@ -1,10 +1,12 @@
 import urllib
 import os
 import cgi
+import datetime
 from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
+from google.appengine.ext import db
 
 class MainPage(webapp.RequestHandler):
     def get(self):
@@ -169,7 +171,7 @@ class ConfirmChannels(webapp.RequestHandler):
 				prehtmlcontent += ("	<li>" + dictChannels[channel] + " - " + channel +  "</li>\n")
 				formcontent += ("<input type='hidden' name='channels' id='" + channel + "' value='" + dictChannels[channel] + "|" + channel + "' />")
 			prehtmlcontent += ("</ul>\n")
-			prehtmlcontent = youhaveselectedpre + "<p>You have selected "+ str(len(selectedchannels)) + " channels to be scanned.</p>\n" + youhaveselectedpost + prehtmlcontent + channellistpost
+			prehtmlcontent = youhaveselectedpre + "<p>You have selected "+ str(len(selectedchannels)) + " channels to be scanned. <i class='icon-arrow-down'></i></p>\n" + youhaveselectedpost + prehtmlcontent + channellistpost
 
 			
 			formcontent += "<label>Search for: </label><input type='text' class='span3' placeholder='New girl' name='series' id='series'>"
@@ -195,6 +197,8 @@ class SearchShow(webapp.RequestHandler):
 		#prehtmlcontent = examinefile("92", "")
 		
 		prehtmlcontent = ""
+		formcontent = ""
+		formaction = ""
 		selectedchannels = self.request.get_all("channels")
 		series = self.request.get("series")
 		foundseries = 0
@@ -236,7 +240,10 @@ class SearchShow(webapp.RequestHandler):
 					foundseries = 1
 			if foundseries == 0: 
 				if len(series) > 2 :
-					prehtmlcontent = "<div class='alert'><h2>A new series of <em>" + series + "</em> was not found - would you like to recieve an email when it is about to be shown?</h2>\n" 
+					prehtmlcontent = "<div class='alert'><h2>A new series of <em>" + series + "</em> was not found </h2> <p>Would you like to recieve an email when it is about to be shown?</p>\n</div>" 
+					formcontent = "<input class='btn' type='submit' value='Set up an email alert'>"
+					formaction = "/setupemailalert"
+
 		
 		
 		#Add all this to the template
@@ -247,10 +254,40 @@ class SearchShow(webapp.RequestHandler):
             'description': "description",
             'author': "Me!",
 			'prehtmlcontent': prehtmlcontent,
+			'formcontent': formcontent,
+			'formaction': formaction,
         }
 		path = os.path.join(os.path.dirname(__file__), 'index.html')
 		self.response.out.write(template.render(path, template_values))
+
 		
+class SetupEmailAlert(webapp.RequestHandler):
+    def post(self):	
+
+		# Use the series search class below to make an entry: 
+		seriessearch = SeriesSearch(channels="0", seriesname="hello", emailto="amanda.owen@gmail.com")
+		seriessearch.put()
+	
+		#Add all this to the template
+		template_values = {
+            'title': "We've done that now! ",
+			'instructions': "Scanning...",
+			'applicationname': "Television Notifications",
+            'description': "description",
+            'author': "Me!",
+			'prehtmlcontent': "",
+        }
+		path = os.path.join(os.path.dirname(__file__), 'index.html')
+		self.response.out.write(template.render(path, template_values))
+	
+
+class SeriesSearch(db.Model):
+	channels = db.StringProperty()
+	seriesname = db.StringProperty()
+	emailto = db.StringProperty()
+
+	
+	
 def examinefile(channelnumber, series):		
 	#Grab the channel file from the Radio Times
 	f = urllib.urlopen("http://xmltv.radiotimes.com/xmltv/" + channelnumber + ".dat")		
@@ -297,7 +334,8 @@ def GetSkyEntertainment():
 application = webapp.WSGIApplication(
                                      [('/', MainPage),
 									  ('/confirmchannels', ConfirmChannels),									  
-									  ('/searchshow', SearchShow)],
+									  ('/searchshow', SearchShow),								  
+									  ('/setupemailalert', SetupEmailAlert)],
                                      debug=True)
 
 def main():

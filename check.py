@@ -7,6 +7,7 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
 from google.appengine.ext import db
 from google.appengine.api import mail
+from google.appengine.api import datastore_types
 
 class MainPage(webapp.RequestHandler):
     def get(self):
@@ -29,15 +30,17 @@ class MainPage(webapp.RequestHandler):
 				message.to = emailaddress
 				message.body = emailstring
 				message.send()
-			self.response.out.write("\n - sent email")
+				self.response.out.write("\n - sent email")
+				#now delete the entry from the data store
+				notification.delete()
 		self.response.out.write("\n<br />DONE")
 		
 
 def SendEmail(emailaddress, emailstring):
-	#message = mail.EmailMessage(sender="notification@televisionnotifier.appspot.com <notification@televisionnotifier.appspot.com>",
-    #                        subject="Television Notifier - new series found")
-	message = mail.EmailMessage(sender="amanda.owen@gmail.com",
+	message = mail.EmailMessage(sender="Television Notification <televisionnotifier@appspot.gserviceaccount.com>",
                             subject="Television Notifier - new series found")
+	#message = mail.EmailMessage(sender="amanda.owen@gmail.com",
+    #                        subject="Television Notifier - new series found")
 	message.to = emailaddress
 	message.body = emailstring
 	message.send()

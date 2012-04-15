@@ -212,7 +212,7 @@ class SearchShow(webapp.RequestHandler):
 		
 		#If we're looking for any news series, make sure all the channels get listed
 		if len(series) < 2 :
-			for channel in selectedchannels:
+			for channel in selectedchannels:			
 				currentlength = currentlength + 1
 				detail = channel.split("|")
 				if currentlength == 1:
@@ -232,6 +232,7 @@ class SearchShow(webapp.RequestHandler):
 			for channel in selectedchannels:
 				currentlength = currentlength + 1
 				detail = channel.split("|")
+				formcontent += ("<input type='hidden' name='channels' id='" + detail[1] + "' value='" + detail[0] + "|" + detail[1] + "' />")
 				resultofsearch = examinefile(detail[1], series)
 				if len(resultofsearch) > 2: 
 					prehtmlcontent +="\n	<div class='alert alert-success'><h2>" + detail[0] + "</h2>"					
@@ -241,10 +242,15 @@ class SearchShow(webapp.RequestHandler):
 			if foundseries == 0: 
 				if len(series) > 2 :
 					prehtmlcontent = "<div class='alert'><h2>A new series of <em>" + series + "</em> was not found </h2> <p>Would you like to recieve an email when it is about to be shown?</p>\n</div>" 
-					formcontent = "<input class='btn' type='submit' value='Set up an email alert'>"
+					formcontent += "<input type='hidden' name ='series' id='series' value='" + series + "' />"
+					formcontent += "<input class='btn' type='submit' value='Set up an email alert'>"
 					formaction = "/setupemailalert"
-
-		
+				else:
+					formcontent = ""
+					formaction = ""
+			else:
+				formcontent = ""
+				formaction = ""		
 		
 		#Add all this to the template
 		template_values = {
@@ -263,10 +269,20 @@ class SearchShow(webapp.RequestHandler):
 		
 class SetupEmailAlert(webapp.RequestHandler):
     def post(self):	
+	
+		user = users.get_current_user()
+		channelstring  = ""
+		series = self.request.get("series")
+		selectedchannels = self.request.get_all("channels")
+		for channel in selectedchannels:
+			channelstring += channel + "#"
+		
 
 		# Use the series search class below to make an entry: 
-		seriessearch = SeriesSearch(channels="0", seriesname="hello", emailto="amanda.owen@gmail.com")
+		seriessearch = SeriesSearch(channels=channelstring, seriesname=series, emailto=user.email())
 		seriessearch.put()
+		
+		prehtmlcontent = GetExistingSearches(user.email())
 	
 		#Add all this to the template
 		template_values = {
@@ -275,19 +291,60 @@ class SetupEmailAlert(webapp.RequestHandler):
 			'applicationname': "Television Notifications",
             'description': "description",
             'author': "Me!",
-			'prehtmlcontent': "",
+			'prehtmlcontent': prehtmlcontent,
         }
 		path = os.path.join(os.path.dirname(__file__), 'index.html')
 		self.response.out.write(template.render(path, template_values))
-	
+		
 
+# ----------------------------------------------------
+# Define each set of channels here
+# ----------------------------------------------------
+def	GetExistingSearches(useremail):
+	returnstring = ""
+	tablerows = ""
+	# The GqlQuery interface constructs a query using a GQL query string.
+	q = db.GqlQuery("SELECT * FROM SeriesSearch " +
+                "WHERE emailto = :1 " + 
+                "ORDER BY emailto ASC",
+                useremail)
+
+	# The query is not executed until results are accessed.
+	results = q.fetch(100)
+	for notification in results:
+		#print "%s %s, %d inches tall" % (p.first_name, p.last_name, p.height)
+		channels = notification.channels
+		channel = channels.split("#")
+		channelstring = ("<ul>\n")
+		for singlechannel in channel:
+			detail = singlechannel.split("|")
+			channelstring += ("	<li>" + detail[0] +  "</li>\n")
+		channelstring += ("</ul>\n")
+		tablerows += "\n\t<tr>\n\t\t<td> %s </td>\n\t\t<td> %s </td>" % (notification.seriesname, channelstring)
+		
+			
+		
+	#if len(tablerows) > 2 :
+	returnstring = "\n<table  class='table table-striped'>\n\t<tr>\n\t\t<th>Series name</th>\n\t\t<th>Channels</th>\n\t</tr>" + tablerows + "\n</table>" + useremail
+	#else:
+	#returnstring = "nothing found" 
+	return returnstring
+		
+
+# ----------------------------------------------------
+# Set up the data
+# ----------------------------------------------------
 class SeriesSearch(db.Model):
 	channels = db.StringProperty()
 	seriesname = db.StringProperty()
 	emailto = db.StringProperty()
 
-	
-	
+
+# ----------------------------------------------------
+# Check through the dat file for each channel to
+# match against the series name
+# TODO: the "fuzzy" matching C mentioned
+# ----------------------------------------------------	
 def examinefile(channelnumber, series):		
 	#Grab the channel file from the Radio Times
 	f = urllib.urlopen("http://xmltv.radiotimes.com/xmltv/" + channelnumber + ".dat")		

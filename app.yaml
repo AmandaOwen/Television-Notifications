@@ -8,8 +8,8 @@ handlers:
   static_dir: css
 - url: /javascript
   static_dir: javascript
-- url: /
-  script: listchannels.py
+- url: /select
+  script: selectchannels.py
 - url: /confirmchannels
   script: listchannels.py
 - url: /searchshow

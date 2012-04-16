@@ -1,0 +1,18 @@
+--------------------------------------------------------
+Who?    So far it's all me: amanda.owen@gmail.com.
+What?   Supposed to be an app that will monitor TV 
+        listings and email when a new series of a
+        specified TV show is due to start in the next
+        week. Further extensions to the scope are 
+        already planned.
+When?   Work started April 2012.
+Where?  UK based TV schedules are being looked at for 
+        the moment. Not sure how easily expanded this is
+        to other countries at the moment.
+How?    So far this is being done via
+        - GitHub
+        - Python
+        - Google App Engine
+        None of which I have prior experience with.
+        So this could be a bit fun! 
+--------------------------------------------------------

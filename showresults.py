@@ -29,25 +29,6 @@ class MainPage(webapp.RequestHandler):
 			
 			if len(selectedchannels) > 0:
 
-				#Set up a dictionary
-				dictChannels = {}
-				for channel in channels: 
-					details = channel.split("|")	
-					dictChannels[details[1]] =  details[0]				
-				
-				#setting up the form (more in loop below)
-				formcontent = ""
-				#setting up the confirmation area
-				prehtmlcontent = ("<ul>\n")
-				for channel in selectedchannels:
-					#prehtmlcontent += ("	<li>" + channel +  "</li>\n")
-					prehtmlcontent += ("	<li>" + dictChannels[channel] + " - " + channel +  "</li>\n")
-					formcontent += ("<input type='hidden' name='channels' id='" + channel + "' value='" + dictChannels[channel] + "|" + channel + "' />")
-				prehtmlcontent += ("</ul>\n")
-				prehtmlcontent = startaccordion + "<p>You have selected " + str(len(selectedchannels)) + " channels to be scanned. <i class='icon-arrow-down'></i></p>\n" + middleaccordion + prehtmlcontent + 	endaccordion				
-				formcontent += "<label>Search for: </label><input type='text' class='span3' placeholder='type series name here' name='series' id='series'>"
-				formcontent += ("<input type='submit' value='Search' class='btn' />")	
-				
 				#Add all this to the template
 				template_values = {
 					'title': title,
@@ -58,8 +39,6 @@ class MainPage(webapp.RequestHandler):
 					'prehtmlcontent': "		<div class='span6'>\n" + prehtmlcontent + "				</div>",
 					'formcontent': "		<div class='span6'>\n" + formcontent + "				</div>",
 					'formaction': formaction,			
-					'username': user.email(),	
-					'logouturl': users.create_logout_url(self.request.uri)	
 				}
 				path = os.path.join(os.path.dirname(__file__), 'index.html')
 				self.response.out.write(template.render(path, template_values))	
@@ -75,8 +54,6 @@ class MainPage(webapp.RequestHandler):
 					'description': description,
 					'author': commonstrings.Author(),
 					'prehtmlcontent': prehtmlcontent,		
-					'username': user.email(),	
-					'logouturl': users.create_logout_url(self.request.uri)	
 				}
 				path = os.path.join(os.path.dirname(__file__), 'index.html')
 				self.response.out.write(template.render(path, template_values))	
@@ -85,7 +62,7 @@ class MainPage(webapp.RequestHandler):
 			self.redirect(users.create_login_url(self.request.uri))
 	
 application = webapp.WSGIApplication(
-                                     [('/series', MainPage)],
+                                     [('/show', MainPage)],
                                      debug=True)
 
 def main():

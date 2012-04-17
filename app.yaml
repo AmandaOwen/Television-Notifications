@@ -4,16 +4,18 @@ runtime: python
 api_version: 1
 
 handlers:
+- url: /img
+  static_dir: img
 - url: /css
   static_dir: css
 - url: /javascript
   static_dir: javascript
-- url: /select
+- url: /channels
   script: selectchannels.py
-- url: /confirmchannels
-  script: listchannels.py
-- url: /searchshow
-  script: listchannels.py
+- url: /series
+  script: selectseries.py
+- url: /show
+  script: showresults.py
 - url: /setupemailalert
   script: listchannels.py
 - url: /check

@@ -92,3 +92,31 @@ def GetTableFoot():
 			</div>
 		""")
 	return s
+
+# ----------------------------------------------------
+# Bits and pieces for the form on the first page
+# ----------------------------------------------------	
+def StartAccordion():
+	s = ("""			
+          <div class="accordion" id="accordion2">
+            <div class="accordion-group">
+              <div class="accordion-heading">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+		""")
+	return s
+def MiddleAccordion():
+	s = ("""			
+		 		</a>
+             </div>
+             <div style="height: 0px;" id="collapseOne" class="accordion-body collapse">
+                <div class="accordion-inner">
+		""")
+	return s
+def EndAccordion():
+	s = ("""
+                </div>
+             </div>
+        </div>
+		</div>
+			""")
+	return s

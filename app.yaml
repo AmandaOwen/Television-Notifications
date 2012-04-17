@@ -16,7 +16,7 @@ handlers:
   script: selectseries.py
 - url: /show
   script: showresults.py
-- url: /setupemailalert
-  script: listchannels.py
+- url: /setupemail
+  script: setemailalert.py
 - url: /check
   script: check.py

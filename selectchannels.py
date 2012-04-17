@@ -10,21 +10,14 @@ from google.appengine.ext.webapp import template
 
 class MainPage(webapp.RequestHandler):
     def get(self):	
-<<<<<<< HEAD
-	
-=======
->>>>>>> 510e4e1cd1fe4448b34543515e7da43dc58ca15e
+
 		user = users.get_current_user()
 		if user:		
 			applicationname = commonstrings.ApplicationName()
 			title = "Choose channels to check"
 			description = "Select which channels you would like to examine"
 			instructions = "Below are UK TV channels, as listed in the Radio Times. Select ones you would like to check, or use the drop down list to select a group. Once you've done this submit the form. On the next page you'll be shown a summary of the channels you've picked, and asked about the series you'd like to check on."
-<<<<<<< HEAD
-			formaction = '/confirmchannels'		
-=======
 			formaction = '/series'		
->>>>>>> 510e4e1cd1fe4448b34543515e7da43dc58ca15e
 			channels = commonstrings.GetChannelInformation()				
 			freeview = commonstrings.GetFreeview()
 			skysports = commonstrings.GetSkySports()
@@ -64,12 +57,7 @@ class MainPage(webapp.RequestHandler):
 			
 			formcontent += commonstrings.GetTableFoot()
 			formcontent += ("<div class='span12'><input type='submit' value='Select channels' class='btn' /></div>")
-			
-<<<<<<< HEAD
-=======
-			
-			
->>>>>>> 510e4e1cd1fe4448b34543515e7da43dc58ca15e
+
 			#Add all this to the template
 			template_values = {
 				'title': title,
@@ -79,13 +67,9 @@ class MainPage(webapp.RequestHandler):
 				'author': commonstrings.Author(),
 				'prehtmlcontent': "",
 				'formcontent': formcontent,	
-<<<<<<< HEAD
-				'formaction': formaction,			
-=======
 				'formaction': formaction,	
 				'username': user.email(),	
 				'logouturl': users.create_logout_url(self.request.uri)	
->>>>>>> 510e4e1cd1fe4448b34543515e7da43dc58ca15e
 			}
 			path = os.path.join(os.path.dirname(__file__), 'index.html')
 			self.response.out.write(template.render(path, template_values))

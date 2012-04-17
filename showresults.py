@@ -14,53 +14,123 @@ class MainPage(webapp.RequestHandler):
 		user = users.get_current_user()
 		if user:		
 			applicationname = commonstrings.ApplicationName()
-			title = "Choose channels to check"
-			description = "Select which series you would like to look out for"
-			instructions = "Check the channels you have selected. Then enter a series name, and check for an upcoming new series. You'll be able to set a notifiation if a new series isn't yet scheduled. If you leave the series blank then you'll be able to see all new series showing on your selected channels."
-			formaction = '/show'		
-			channels = commonstrings.GetChannelInformation()				
-			startaccordion = commonstrings.StartAccordion()
-			middleaccordion = commonstrings.MiddleAccordion()
-			endaccordion = commonstrings.EndAccordion()
+			title = "Results of your series search"
+			description = "The result of the series search"
+			instructions = "Below are all the new series showing on your selected channels."
+			formaction = '/setemail'		
+			formcontent = ""
+			prehtmlcontent = ""
+			channels = commonstrings.GetChannelInformation()	
 			
 			
 			#check if a channel has been selected
 			selectedchannels = self.request.get_all("channels")
+			series = self.request.get("series")
+			foundseries = 0			
+			columnlength = len(selectedchannels) / 4
+			currentlength = 0
+		
+			if len(series) < 2 :
+				series = ""
 			
-			if len(selectedchannels) > 0:
+			#If we're looking for any new series, make sure all the channels get listed
+			if len(series) < 2 :
+				for channel in selectedchannels:			
+					currentlength = currentlength + 1
+					detail = channel.split("|")
+					if currentlength == 1:
+						prehtmlcontent +="\n<div  class='span3'>"
+					resultofsearch = examinefile(detail[1], series)
+					prehtmlcontent +="\n	<div class='alert'><h2>" + detail[0] + "</h2>"
+					if len(resultofsearch) < 2: 
+						resultofsearch = "\n			<p>No new series found</p>"
+					prehtmlcontent += resultofsearch
+					prehtmlcontent += "\n	</div>"
+					if currentlength > columnlength: 
+						prehtmlcontent += "\n</div>"
+						currentlength = 0
+				prehtmlcontent += "\n</div>"	
+			#If we're looking for a specific series, only list the channels that are showing it, if any
+			else :		
+				for channel in selectedchannels:
+					currentlength = currentlength + 1
+					detail = channel.split("|")
+					formcontent += ("<input type='hidden' name='channels' id='" + detail[1] + "' value='" + detail[0] + "|" + detail[1] + "' />")
+					resultofsearch = examinefile(detail[1], series)
+					if len(resultofsearch) > 2: 
+						prehtmlcontent +="\n	<div class='alert alert-success'><h2>" + detail[0] + "</h2>"					
+						prehtmlcontent += resultofsearch
+						prehtmlcontent += "\n	</div>"
+						foundseries = 1
+				if foundseries == 0: 
+					if len(series) > 2 :
+						prehtmlcontent = "<div class='alert'><h2>A new series of <em>" + series + "</em> was not found </h2> <p>Would you like to recieve an email when it is about to be shown?</p>\n</div>" 
+						formcontent += "<input type='hidden' name ='series' id='series' value='" + series + "' />"
+						formcontent += "<input class='btn' type='submit' value='Set up an email alert'>"
+						formaction = "/setemail"
+						instructions = "Could not find an episode of your chosen series. You can set an alert: this will email you at " + user.email() + " if a new seres is due to be shown soon."
+					else:
+						formcontent = ""
+						formaction = ""
+				else:
+					formcontent = ""
+					formaction = ""		
+		
 
-				#Add all this to the template
-				template_values = {
-					'title': title,
-					'instructions': instructions,
-					'applicationname': applicationname,
-					'description': description,
-					'author': commonstrings.Author(),
-					'prehtmlcontent': "		<div class='span6'>\n" + prehtmlcontent + "				</div>",
-					'formcontent': "		<div class='span6'>\n" + formcontent + "				</div>",
-					'formaction': formaction,			
-				}
-				path = os.path.join(os.path.dirname(__file__), 'index.html')
-				self.response.out.write(template.render(path, template_values))	
-			else :
-				#if no channels were selected	
-				instructions = "You would normally get to select your series here - but you haven't selected any channels yet!"
-				prehtmlcontent = "Please go back to the <a href='/channels'>Channels</a> page to select your channels before attempting this step."
 
-				template_values = {
-					'title': title,
-					'instructions': instructions,
-					'applicationname': applicationname,
-					'description': description,
-					'author': commonstrings.Author(),
-					'prehtmlcontent': prehtmlcontent,		
-				}
-				path = os.path.join(os.path.dirname(__file__), 'index.html')
-				self.response.out.write(template.render(path, template_values))	
-			
+			#Add all this to the template
+			template_values = {
+				'title': title,
+				'instructions': instructions,
+				'applicationname': applicationname,
+				'description': description,
+				'author': commonstrings.Author(),
+				'prehtmlcontent': prehtmlcontent,
+				'formcontent': formcontent,
+				'formaction': formaction,			
+				'username': user.email(),	
+				'logouturl': users.create_logout_url(self.request.uri)	
+			}
+			path = os.path.join(os.path.dirname(__file__), 'index.html')
+			self.response.out.write(template.render(path, template_values))	
+
 		else: 
 			self.redirect(users.create_login_url(self.request.uri))
-	
+
+# ----------------------------------------------------
+# Check through the dat file for each channel to
+# match against the series name
+# TODO: the "fuzzy" matching C mentioned
+# ----------------------------------------------------	
+def examinefile(channelnumber, series):		
+	#Grab the channel file from the Radio Times
+	f = urllib.urlopen("http://xmltv.radiotimes.com/xmltv/" + channelnumber + ".dat")		
+	s = f.read()
+	f.close()
+	s = s.lower()
+	listofprogrammes = ""
+	#Array up the data, and remove the non-programme entries
+	programmes = s.split('\n')
+	programmes.remove(programmes[0])
+	programmes.remove(programmes[0])
+	programmes.remove('')
+	for programme in programmes:
+		detail = programme.split("~")
+		if len(series) > 0:
+			if series.lower() == detail[0]:
+				if detail[11] == "true":
+					listofprogrammes += ("	<li><strong style='text-transform:capitalize'>" + detail[0] +  "</strong> - " + detail[1] + ": " + detail[19] + " (" + detail[20] + ") </li>\n")
+		else:
+			if detail[11] == "true" :
+				listofprogrammes += ("	<li><strong style='text-transform:capitalize'>" + detail[0] +  "</strong> - " + detail[1] + ": " + detail[19] + " (" + detail[20] + ") </li>\n")
+	if len(listofprogrammes) < 3:
+		listofprogrammes = ""
+	else:
+		listofprogrammes = ("\n		<ul>\n" + listofprogrammes + "\n		</ul>")
+	return listofprogrammes
+
+
+			
 application = webapp.WSGIApplication(
                                      [('/show', MainPage)],
                                      debug=True)

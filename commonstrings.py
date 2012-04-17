@@ -92,3 +92,31 @@ def GetTableFoot():
 			</div>
 		""")
 	return s
+
+# ----------------------------------------------------
+# Bits and pieces for the second page
+# ----------------------------------------------------	
+def StartAccordian():
+	s = ("""			
+          <div class="accordion" id="accordion2">
+            <div class="accordion-group">
+              <div class="accordion-heading alert-success">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+		""")
+	return s
+def MiddleAccordian():
+	s = ("""
+		 		</a>
+             </div>
+             <div style="height: 0px;" id="collapseOne" class="accordion-body collapse">
+                <div class="accordion-inner alert-success">
+        """)
+	return s
+def EndAccordian():
+	s = ("""
+                </div>
+             </div>
+        </div>
+		</div>
+			""")	
+	return s

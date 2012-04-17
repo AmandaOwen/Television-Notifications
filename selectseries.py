@@ -58,6 +58,8 @@ class MainPage(webapp.RequestHandler):
 					'prehtmlcontent': "		<div class='span6'>\n" + prehtmlcontent + "				</div>",
 					'formcontent': "		<div class='span6'>\n" + formcontent + "				</div>",
 					'formaction': formaction,			
+					'username': user.email(),	
+					'logouturl': users.create_logout_url(self.request.uri)	
 				}
 				path = os.path.join(os.path.dirname(__file__), 'index.html')
 				self.response.out.write(template.render(path, template_values))	
@@ -73,6 +75,8 @@ class MainPage(webapp.RequestHandler):
 					'description': description,
 					'author': commonstrings.Author(),
 					'prehtmlcontent': prehtmlcontent,		
+					'username': user.email(),	
+					'logouturl': users.create_logout_url(self.request.uri)	
 				}
 				path = os.path.join(os.path.dirname(__file__), 'index.html')
 				self.response.out.write(template.render(path, template_values))	

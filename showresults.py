@@ -17,7 +17,7 @@ class MainPage(webapp.RequestHandler):
 			title = "Results of your series search"
 			description = "The result of the series search"
 			instructions = "Below are all the new series showing on your selected channels."
-			formaction = '/setemail'		
+			formaction = '/setupemail'		
 			formcontent = ""
 			prehtmlcontent = ""
 			channels = commonstrings.GetChannelInformation()	
@@ -67,7 +67,7 @@ class MainPage(webapp.RequestHandler):
 						prehtmlcontent = "<div class='alert'><h2>A new series of <em>" + series + "</em> was not found </h2> <p>Would you like to recieve an email when it is about to be shown?</p>\n</div>" 
 						formcontent += "<input type='hidden' name ='series' id='series' value='" + series + "' />"
 						formcontent += "<input class='btn' type='submit' value='Set up an email alert'>"
-						formaction = "/setemail"
+						formaction = "/setupemail"
 						instructions = "Could not find an episode of your chosen series. You can set an alert: this will email you at " + user.email() + " if a new seres is due to be shown soon."
 					else:
 						formcontent = ""

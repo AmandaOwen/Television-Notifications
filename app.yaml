@@ -20,3 +20,7 @@ handlers:
   script: setemailalert.py
 - url: /check
   script: check.py
+- url: /cron/channels
+  script: getchannelslist.py
+- url: /cron/schedule
+  script: geteachschedule.py

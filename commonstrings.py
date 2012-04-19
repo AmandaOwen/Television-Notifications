@@ -15,6 +15,7 @@ def Author():
 # Work on the Radio Times dat files
 # ----------------------------------------------------	
 def GetChannelInformation(): 
+	TargetChannels  = GetTargetChannels()
 	#Find the file
 	f = urllib.urlopen("http://xmltv.radiotimes.com/xmltv/channels.dat")		
 	s = f.read()
@@ -27,7 +28,9 @@ def GetChannelInformation():
 	sortingchannels = ['']
 	for channel in channels: 
 		details = channel.split("|")	
-		sortingchannels.append(details[1] + "|" + details[0])
+		#only keep channels that show series and are big enough. Dump music/film/news channels
+		if details[1] in TargetChannels: 
+			sortingchannels.append(details[1] + "|" + details[0])
 	channels = sortingchannels
 	channels.remove('')
 	channels.sort()
@@ -36,6 +39,12 @@ def GetChannelInformation():
 # ----------------------------------------------------
 # Define each set of channels here
 # ----------------------------------------------------
+def GetTargetChannels(): 
+	channels = ['Channel 4 HD', 'BBC1', 'BBC2', 'BBC3', 'BBC4', 'BBC HD', 'CBBC', 'CBeebies', 'Channel 4', 
+			'More4', 'Film4', 'E4', '4Music', 'Channel 5', '5*', '5USA', 'ITV1', 'ITV2', 'ITV3', 'ITV4',  
+			'CITV', 'S4C', 'Quest', 'Yesterday', 'Challenge',  'Dave', 'Sky Atlantic', 'Sky 1', 'Sky Living', 
+			'Sky Arts 1', 'Sky Arts 2', 'Comedy Central', 'FX']
+	return channels
 def GetFreeview(): 
 	channels = ['Channel 4 HD', 'BBC1', 'BBC1 HD', 'BBC2', 'BBC3', 'BBC4', 'BBC News', 'BBC HD', 'CBBC', 'CBeebies', 'Channel 4', 
 			'More4', 'Film4', 'E4', '4Music', 'Channel 5', 'Channel 5 HD', '5*', '5USA', 'ITV1', 'ITV2', 'ITV3', 'ITV4', 'ITV1 HD', 

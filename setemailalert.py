@@ -65,7 +65,6 @@ def	GetExistingSearches(useremail):
 	# The query is not executed until results are accessed.
 	results = q.fetch(100)
 	for notification in results:
-		#print "%s %s, %d inches tall" % (p.first_name, p.last_name, p.height)
 		channels = notification.channels
 		channel = channels.split("#")
 		channel.remove('')

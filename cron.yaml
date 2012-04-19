@@ -2,3 +2,9 @@ cron:
 - description: daily summary job
   url: /check
   schedule: every 24 hours
+- description: Import list of channels to check 
+  url: /cron/channels
+  schedule: every day 00:06
+- description: Update the schedule 
+  url: /cron/schedule
+  schedule: every 1 minutes from 00:08 to 01:00

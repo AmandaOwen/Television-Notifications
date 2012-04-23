@@ -18,8 +18,13 @@ class MainPage(webapp.RequestHandler):
 		
 		#-------------------------------------------------------------------
 		# TO DO:
-		# Grabs the next unchecked channel from the datastore and checks it
-		# Profiles at just over *** second
+		# 1) Make a list of *series* to check
+		#
+		# In another file (or files).......................
+		# 2) Grab an unchecked channel's dat file
+		# 3) Delete channel from unchecked channel list
+		# 4) If series exists in channel write details to a temp db
+		# 
 		#-------------------------------------------------------------------
 
 		q = db.GqlQuery("SELECT * FROM ChannelInformation WHERE channelchecked = False")

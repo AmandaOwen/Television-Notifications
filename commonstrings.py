@@ -41,7 +41,7 @@ def GetChannelInformation():
 # ----------------------------------------------------
 def GetTargetChannels(): 
 	channels = ['Channel 4 HD', 'BBC1', 'BBC2', 'BBC3', 'BBC4', 'BBC HD', 'CBBC', 'CBeebies', 'Channel 4', 
-			'More4', 'Film4', 'E4', '4Music', 'Channel 5', '5*', '5USA', 'ITV1', 'ITV2', 'ITV3', 'ITV4',  
+			'More4', 'Film4', 'E4', 'Channel 5', '5*', '5USA', 'ITV1', 'ITV2', 'ITV3', 'ITV4',  
 			'CITV', 'S4C', 'Quest', 'Yesterday', 'Challenge',  'Dave', 'Sky Atlantic', 'Sky 1', 'Sky Living', 
 			'Sky Arts 1', 'Sky Arts 2', 'Comedy Central', 'FX']
 	return channels

@@ -17,10 +17,10 @@ handlers:
 - url: /show
   script: showresults.py
 - url: /setupemail
-  script: setemailalert.py
+  script: setemailalertv2.py
 - url: /check
   script: check.py
 - url: /cron/channels
-  script: getchannelslist.py
+  script: getchannelslistv2.py
 - url: /cron/schedule
-  script: geteachschedule.py
+  script: geteachprogramme.py

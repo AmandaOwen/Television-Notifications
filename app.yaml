@@ -27,9 +27,14 @@ handlers:
 # ----------------------------- (3) Automated, daily : adding facts to datastore files
 # ----------------------------- 	(a) list channels that need checking
 # ----------------------------- 	(b) list programmes that need checking
-# ----------------------------- 	(c) TODO: check each channel for that series
-# ----------------------------- 	(d) TODO: Email results
+# ----------------------------- 	(c) TODO: list series "possibles" per channel
+# ----------------------------- 		(The idea here is to call the file for each possible 
+# ----------------------------- 		channel from the cron.yaml file)
+# ----------------------------- 	(d) TODO: Search possibles for actual matches
+# ----------------------------- 	(e) TODO: Email results
 - url: /cron/channels
-  script: getchannelslistv2.py
+  script: cron-channels.py
 - url: /cron/series
-  script: geteachprogramme.py
+  script: cron-series.py
+- url: /cron/possibles/(.*)
+  script: cron-possibles.py?channel=\1

@@ -10,7 +10,13 @@ def ApplicationName():
 def Author(): 
 	return "Amanda Owen"
 
-
+def ParseEntry(entry):
+		if entry=="false":
+			return False
+		else :
+			return True
+	
+	
 # ----------------------------------------------------
 # Work on the Radio Times dat files
 # ----------------------------------------------------	

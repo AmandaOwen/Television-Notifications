@@ -4,12 +4,18 @@ runtime: python
 api_version: 1
 
 handlers:
+# ----------------------------- (1) static folders ---------------------- 
 - url: /img
   static_dir: img
 - url: /css
   static_dir: css
 - url: /javascript
   static_dir: javascript
+# ----------------------------- (2) user input files ---------------------- 
+# ----------------------------- 	(a) Select channels 
+# ----------------------------- 	(b) Select series  
+# ----------------------------- 	(c) Recieve results 
+# ----------------------------- 	(d) Setup email     
 - url: /channels
   script: selectchannels.py
 - url: /series
@@ -18,9 +24,12 @@ handlers:
   script: showresults.py
 - url: /setupemail
   script: setemailalertv2.py
-- url: /check
-  script: check.py
+# ----------------------------- (3) Automated, daily : adding facts to datastore files
+# ----------------------------- 	(a) list channels that need checking
+# ----------------------------- 	(b) list programmes that need checking
+# ----------------------------- 	(c) TODO: check each channel for that series
+# ----------------------------- 	(d) TODO: Email results
 - url: /cron/channels
   script: getchannelslistv2.py
-- url: /cron/schedule
+- url: /cron/series
   script: geteachprogramme.py

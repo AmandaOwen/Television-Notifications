@@ -1,10 +1,110 @@
 cron:
-- description: daily summary job
-  url: /check
-  schedule: every 24 hours
-- description: Import list of channels to check 
+- description: set up a list of channels to check
   url: /cron/channels
-  schedule: every day 00:06
-- description: Update the schedule 
-  url: /cron/schedule
-  schedule: every 1 minutes from 00:08 to 01:00
+  schedule: every day 00:01
+- description: set up a list of series to check for 
+  url: /cron/series
+  schedule: every day 00:03
+- description: first pass for possibles: Channel 4 HD
+  url: /cron/possibles/2056
+  schedule: every day 00:05
+- description: first pass for possibles: BBC1
+  url: /cron/possibles/92
+  schedule: every day 00:07
+- description: first pass for possibles: BBC2
+  url: /cron/possibles/105
+  schedule: every day 00:09
+- description: first pass for possibles: BBC3
+  url: /cron/possibles/45
+  schedule: every day 00:11
+- description: first pass for possibles: BBC4
+  url: /cron/possibles/92
+  schedule: every day 00:13
+- description: first pass for possibles: BBC HD
+  url: /cron/possibles/1994
+  schedule: every day 00:15
+- description: first pass for possibles: CBBC
+  url: /cron/possibles/482
+  schedule: every day 00:17
+- description: first pass for possibles: CBeebies
+  url: /cron/possibles/483
+  schedule: every day 00:19
+- description: first pass for possibles: Channel 4
+  url: /cron/possibles/132
+  schedule: every day 00:21
+- description: first pass for possibles: More 4
+  url: /cron/possibles/1959
+  schedule: every day 00:23
+- description: first pass for possibles: Film 4
+  url: /cron/possibles/160
+  schedule: every day 00:25
+- description: first pass for possibles: E 4
+  url: /cron/possibles/158
+  schedule: every day 00:27
+- description: first pass for possibles: Channel 5
+  url: /cron/possibles/134
+  schedule: every day 00:29
+- description: first pass for possibles: 5*
+  url: /cron/possibles/2062
+  schedule: every day 00:31
+- description: first pass for possibles: 5USA
+  url: /cron/possibles/2008
+  schedule: every day 00:33
+- description: first pass for possibles: ITV1 Channel
+  url: /cron/possibles/28
+  schedule: every day 00:35
+- description: first pass for possibles: ITV2
+  url: /cron/possibles/185
+  schedule: every day 00:37
+- description: first pass for possibles: ITV3
+  url: /cron/possibles/1859
+  schedule: every day 00:39
+- description: first pass for possibles: ITV4
+  url: /cron/possibles/1961
+  schedule: every day 00:41
+- description: first pass for possibles: CITV
+  url: /cron/possibles/1981
+  schedule: every day 00:43
+- description: first pass for possibles: S4C
+  url: /cron/possibles/721
+  schedule: every day 00:45
+- description: first pass for possibles: Quest
+  url: /cron/possibles/2179
+  schedule: every day 00:47
+- description: first pass for possibles: Yesterday
+  url: /cron/possibles/801
+  schedule: every day 00:49
+- description: first pass for possibles: Challenge
+  url: /cron/possibles/131
+  schedule: every day 00:51
+- description: first pass for possibles: Dave
+  url: /cron/possibles/2050
+  schedule: every day 00:53
+- description: first pass for possibles: Sky Atlantic
+  url: /cron/possibles/2685
+  schedule: every day 00:55
+- description: first pass for possibles: Sky 1
+  url: /cron/possibles/248
+  schedule: every day 00:57
+- description: first pass for possibles: Sky Living
+  url: /cron/possibles/197
+  schedule: every day 00:59
+- description: first pass for possibles: Arts 1
+  url: /cron/possibles/40
+  schedule: every day 01:01
+- description: first pass for possibles: Arts 2
+  url: /cron/possibles/2122
+  schedule: every day 01:03
+- description: first pass for possibles: Comedy Central
+  url: /cron/possibles/1061
+  schedule: every day 01:05
+- description: first pass for possibles: FX
+  url: /cron/possibles/1461
+  schedule: every day 01:07
+- description: Send emails to people
+  url: /cron/emails
+  schedule: every day 01:09
+- description: clear up old datastore entries
+  url: /cron/clearup
+  schedule: every day 01:11
+

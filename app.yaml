@@ -30,8 +30,8 @@ handlers:
 # ----------------------------- 	(c) list series "possibles" per channel
 # ----------------------------- 		(The idea here is to call the file for each possible 
 # ----------------------------- 		channel from the cron.yaml file)
-# ----------------------------- 	(d) TODO: Search possibles for actual matches
-# ----------------------------- 	(e) TODO: Email results
+# ----------------------------- 	(d) Search possibles for actual matches and email results
+# ----------------------------- 	(e) TODO: Remove temporary entities from datastore
 - url: /cron/channels
   script: cron-channels.py
 - url: /cron/series
@@ -40,3 +40,5 @@ handlers:
   script: cron-possibles.py?channel=\1
 - url: /cron/emails
   script: cron-emails.py
+- url: /cron/clearup
+  script: cron-clearup.py

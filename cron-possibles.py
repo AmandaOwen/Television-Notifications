@@ -74,9 +74,8 @@ class SeriesSearch(db.Model):
 	checked = db.DateTimeProperty()
 class PossiblesToCheck(db.Model):
 	ChannelNumber = db.StringProperty()
-	SeriesName = db.TextProperty()
-	SubTitle = db.TextProperty()
-	Episode = db.TextProperty()	
+	SeriesName = db.StringProperty()
+	Episode = db.StringProperty()	
 	NewSeries = db.BooleanProperty()	
 	Date = db.DateTimeProperty()
 	StartTime = db.DateTimeProperty() 
